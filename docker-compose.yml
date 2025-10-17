@@ -1,0 +1,55 @@
+services:
+  nginx:
+    image: nginx:1.25
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - php-fpm-socket:/var/run/php-fpm
+    depends_on:
+      - php-fpm
+
+  php-fpm:
+    image: php:8.4-fpm
+    cap_add:
+      - SYS_PTRACE
+    volumes:
+      - php-fpm-socket:/var/run/php-fpm
+      - ./php/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - ./php/php-fpm.d:/usr/local/etc/php-fpm.d
+      - ./php/scripts:/home/www/php/scripts
+      - php-logs:/var/log/php-fpm
+    command: /usr/local/sbin/php-fpm --nodaemonize
+
+  fluent-bit:
+    image: fluent/fluent-bit:4.1
+    volumes:
+      - ./fluent-bit/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
+      - ./fluent-bit/parsers.yaml:/fluent-bit/etc/parsers.yaml
+      - php-logs:/var/log/php-fpm
+    depends_on:
+      - php-fpm
+      - grafana-otel-lgtm
+    command: -c /fluent-bit/etc/fluent-bit.yaml
+
+  # The grafana/otel-lgtm image contains a preconfigured OpenTelemetry backend based on the OpenTelemetry Collector, Prometheus, Loki, Tempo, and Grafana.
+  grafana-otel-lgtm:
+    image: grafana/otel-lgtm:0.11.10
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    # You can enable logging for troubleshooting
+    # Ref. https://github.com/grafana/docker-otel-lgtm?tab=readme-ov-file#enable-logging
+#    environment:
+#      - ENABLE_LOGS_LOKI=true
+#      - ENABLE_LOGS_PROMETHEUS=true
+#      - ENABLE_LOGS_OTELCOL=true
+    volumes:
+      - ./otelcol/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml
+      - otel-lgtm-data:/data
+
+volumes:
+  php-fpm-socket:
+  php-logs:
+  otel-lgtm-data:
