@@ -1,0 +1,43 @@
+# Ref. https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/yaml
+service:
+  flush: 1
+  log_level: info
+  parsers_file: /fluent-bit/etc/parsers.yaml
+
+pipeline:
+  # Ref. https://docs.fluentbit.io/manual/data-pipeline/inputs
+  inputs:
+    - name: tail
+      path: /var/log/php-fpm/slow.log
+      tag: php.slow
+      # Ref. https://docs.fluentbit.io/manual/data-pipeline/inputs/tail#multiline-support
+      multiline.parser: php_slow
+
+  # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters
+  filters:
+    # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/parser
+    - name: parser
+      match: php.slow
+      parser: php_slow_fields
+      key_name: log
+      preserve_key: on
+
+    # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/modify
+    - name: modify
+      match: php.slow
+      Rename:
+        - log raw_log
+      Add:
+        - severity warning
+        - topic php-fpm.slow
+        - service.name php-fpm
+
+  # Ref. https://docs.fluentbit.io/manual/data-pipeline/outputs
+  outputs:
+    # Ref. https://docs.fluentbit.io/manual/data-pipeline/outputs/opentelemetry
+    - name: opentelemetry
+      match: '*'
+      host: grafana-otel-lgtm
+      port: 4318
+      logs_uri: /v1/logs
+      log_response_payload: true

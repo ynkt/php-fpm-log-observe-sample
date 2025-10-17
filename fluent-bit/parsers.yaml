@@ -1,0 +1,22 @@
+# Ref. https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/multiline-parsing
+multiline_parsers:
+  - name: php_slow
+    type: regex
+    rules:
+      - state: start_state
+        regex: '^\[\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}\]  \[pool www\] pid \d+'
+        next_state: script_filename
+      - state: script_filename
+        regex: '^script_filename = '
+        next_state: backtrace
+      - state: backtrace
+        regex: '^\[0x[0-9a-f]+\]'
+        next_state: backtrace
+
+# Ref. https://docs.fluentbit.io/manual/data-pipeline/parsers
+parsers:
+  - name: php_slow_fields
+    format: regex
+    regex: '^\[(?<timestamp>\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2})\]  \[pool www\] pid \d+\nscript_filename = (?<script_filename>[^\s]+)\n\[0x[0-9a-f]+\] (?<top_stack_frame>[^(]+\(.*\) [^:]+)'
+    time_key: timestamp
+    time_keep: on
