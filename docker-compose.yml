@@ -47,6 +47,8 @@ services:
 #      - ENABLE_LOGS_OTELCOL=true
     volumes:
       - ./otelcol/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml
+      - ./grafana/grafana-dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/grafana-dashboards.yaml
+      - ./grafana/dashboard-php-slow-log.json:/otel-lgtm/grafana-dashboard-php-slow-log.json
       - otel-lgtm-data:/data
 
 volumes:
