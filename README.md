@@ -6,6 +6,12 @@ This repository is intended as a companion project for a technical blog about im
 
 ![Grafana Dashboard](/images/dashboard.png)
 
+## Table of Contents
+- [Components](#components)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Log/Metric Flow](#logmetric-flow)
+
 ## Components
 - **Nginx**: Serves as a frontend proxy to PHP-FPM.
 - **PHP-FPM**: Generates slow logs as raw multi-line text.
