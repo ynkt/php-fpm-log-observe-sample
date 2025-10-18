@@ -62,3 +62,41 @@ You can then explore the logs and metrics in Grafana dashboards.
 2. **Fluent Bit** aggregates lines into a single structured log record using regex parser.
 3. **OpenTelemetry Collector** processes and forwards logs to **Loki** and metrics to **Prometheus**.
 4. **Grafana** visualizes logs and metrics in dashboards.
+
+To better illustrate the flow, the following diagrams separate the perspectives of service users (Client) and operators (Operator).
+
+1. Client to System Internal Flow
+
+```mermaid
+flowchart LR
+    Client((Client))
+    Nginx[Nginx]
+    PHPFPM[PHP-FPM]
+    FluentBit[Fluent Bit]
+    OTEL[OpenTelemetry Collector]
+    Loki[Loki]
+    Prometheus[Prometheus]
+
+    Client -- "Request" --> Nginx
+    Nginx --> PHPFPM
+    PHPFPM -- "Raw Slow Log" --> FluentBit
+    FluentBit -- "Structured Log" --> OTEL
+    OTEL -- "Logs" --> Loki
+    OTEL -- "Metrics" --> Prometheus
+```
+
+2. Operator Visualization Flow
+
+```mermaid
+flowchart LR
+    Operator((Operator))
+    Grafana[Grafana]
+    Loki[Loki]
+    Prometheus[Prometheus]
+
+    Operator -- "View Dashboards" --> Grafana
+    Grafana -- "Query Logs" --> Loki
+    Grafana -- "Query Metrics" --> Prometheus
+```
+
+These diagrams clarify the roles and data flow between the service user and the system operator.
