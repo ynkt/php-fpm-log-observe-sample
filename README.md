@@ -4,6 +4,8 @@ A sample environment to observe PHP-FPM slow logs using **Fluent Bit**, **OpenTe
 
 This repository is intended as a companion project for a technical blog about improving observability in PHP-FPM through structured logging and visualization.
 
+![Grafana Dashboard](/images/dashboard.png)
+
 ## Components
 - **Nginx**: Serves as a frontend proxy to PHP-FPM.
 - **PHP-FPM**: Generates slow logs as raw multi-line text.
@@ -35,9 +37,9 @@ docker-compose up -d
 
 ### Step 3: Access the Dashboard
 
-Once the services are up and running, open the Grafana UI:
+Once the services are up and running, open the Grafana dashboard:
 
-- **Grafana UI**: http://localhost:3000
+- **Grafana UI**: http://localhost:3000/dashboards
 
 ### Step 4: Explore Logs and Metrics
 
