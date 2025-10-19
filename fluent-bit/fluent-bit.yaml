@@ -7,30 +7,40 @@ service:
 pipeline:
   # Ref. https://docs.fluentbit.io/manual/data-pipeline/inputs
   inputs:
+    # Ref. https://docs.fluentbit.io/manual/data-pipeline/inputs/tail
     - name: tail
       path: /var/log/php-fpm/slow.log
       tag: php.slow
       # Ref. https://docs.fluentbit.io/manual/data-pipeline/inputs/tail#multiline-support
       multiline.parser: php_slow
 
-  # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters
-  filters:
-    # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/parser
-    - name: parser
-      match: php.slow
-      parser: php_slow_fields
-      key_name: log
-      preserve_key: on
+      # Ref. https://docs.fluentbit.io/manual/data-pipeline/processors
+      processors:
+        logs:
+          # https://docs.fluentbit.io/manual/data-pipeline/processors/content-modifier
+          - name: content_modifier
+            context: attributes
+            action: upsert
+            key: topic
+            value: php-fpm.slow
 
-    # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/modify
-    - name: modify
-      match: php.slow
-      Rename:
-        - log raw_log
-      Add:
-        - severity warning
-        - topic php-fpm.slow
-        - service.name php-fpm
+          # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/modify
+          - name: modify
+            Rename: log raw_log
+
+          # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/parser
+          - name: parser
+            parser: php_slow_fields
+            key_name: raw_log
+            preserve_key: on
+
+          - name: modify
+            Add: severity warning
+
+          # Ref. https://docs.fluentbit.io/manual/data-pipeline/filters/lua
+          - name: lua
+            script: filters.lua
+            call: append_backtrace
 
   # Ref. https://docs.fluentbit.io/manual/data-pipeline/outputs
   outputs:
@@ -41,3 +51,12 @@ pipeline:
       port: 4318
       logs_uri: /v1/logs
       log_response_payload: true
+      processors:
+        logs:
+          # Ref. https://docs.fluentbit.io/manual/data-pipeline/processors/opentelemetry-envelope
+          - name: opentelemetry_envelope
+          - name: content_modifier
+            context: otel_resource_attributes
+            action: upsert
+            key: service.name
+            value: php-fpm
