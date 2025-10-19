@@ -30,7 +30,7 @@ connectors:
   # Ref. https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/signaltometricsconnector
   signaltometrics/php_fpm_slow_log:
     logs:
-      # Generate count metrics based on PHP-FPM slow logs
+      # Generate a count metric from each PHP-FPM slow log entry
       - name: php_fpm_slow_log_count
         description: PHP-FPM slow logs count.
         conditions:
