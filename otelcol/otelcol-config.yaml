@@ -34,24 +34,14 @@ connectors:
       - name: php_fpm_slow_log_count
         description: PHP-FPM slow logs count.
         conditions:
-          - log.body["topic"] == "php-fpm.slow"
+          - log.attributes["topic"] == "php-fpm.slow"
         attributes:
           - key: script_filename
-          - key: top_stack_frame
         sum:
           value: "1"
 
 processors:
   batch:
-  # Ref. https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/transformprocessor
-  transform/logs:
-    error_mode: ignore
-    log_statements:
-      - statements:
-        # Since OpenTelemetry cannot determine the resource information of the logs,
-        # set the service.name received from the sender.
-        - set(resource.attributes["service.name"], log.body["service.name"])
-
   # Ref. https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/transformprocessor
   transform/php_fpm_slow_log:
     error_mode: ignore
@@ -63,7 +53,6 @@ processors:
           # it is necessary to set it in log.attributes and pass it.
           # Ref. Log Context: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/contexts/ottllog/README.md
           - set(log.attributes["script_filename"], log.body["script_filename"])
-          - set(log.attributes["top_stack_frame"], log.body["top_stack_frame"])
 
   # Ref. https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/transformprocessor
   transform/php_fpm_slow_log_metrics:
@@ -116,7 +105,7 @@ service:
       #exporters: [otlphttp/metrics,debug/metrics]
     logs:
       receivers: [otlp]
-      processors: [batch, transform/logs, transform/php_fpm_slow_log]
+      processors: [batch, transform/php_fpm_slow_log]
       exporters: [otlphttp/logs, signaltometrics/php_fpm_slow_log]
       #exporters: [otlphttp/logs,debug/logs]]
     profiles:
