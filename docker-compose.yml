@@ -49,7 +49,8 @@ services:
     volumes:
       - ./otelcol/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml
       - ./grafana/grafana-dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/grafana-dashboards.yaml
-      - ./grafana/dashboard-php-slow-log.json:/otel-lgtm/grafana-dashboard-php-slow-log.json
+      - ./grafana/dashboard-php-slow-log-from-metrics.json:/otel-lgtm/grafana-dashboard-php-slow-log-from-metrics.json
+      - ./grafana/dashboard-php-slow-log-from-logs.json:/otel-lgtm/grafana-dashboard-php-slow-log-from-logs.json
       - otel-lgtm-data:/data
 
 volumes:

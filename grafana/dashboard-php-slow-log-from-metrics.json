@@ -438,7 +438,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "PHP Slow Log Dashboard",
+  "title": "PHP Slow Log Dashboard (From Metrics)",
   "uid": "2f8eb7d9-3415-4adb-805f-f6ca59e208a3",
   "version": 2
 }

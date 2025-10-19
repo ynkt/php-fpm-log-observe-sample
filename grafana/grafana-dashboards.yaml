@@ -1,8 +1,13 @@
 apiVersion: 1
 
 providers:
-  - name: "PHP Slow Log"
+  - name: "PHP Slow Log (From Metrics)"
     type: file
     options:
-      path: /otel-lgtm/grafana-dashboard-php-slow-log.json
+      path: /otel-lgtm/grafana-dashboard-php-slow-log-from-metrics.json
+      foldersFromFilesStructure: false
+  - name: "PHP Slow Log (From Logs)"
+    type: file
+    options:
+      path: /otel-lgtm/grafana-dashboard-php-slow-log-from-logs.json
       foldersFromFilesStructure: false
