@@ -26,6 +26,7 @@ services:
     volumes:
       - ./fluent-bit/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
       - ./fluent-bit/parsers.yaml:/fluent-bit/etc/parsers.yaml
+      - ./fluent-bit/filters.lua:/fluent-bit/etc/filters.lua
       - php-logs:/var/log/php-fpm
     depends_on:
       - php-fpm
