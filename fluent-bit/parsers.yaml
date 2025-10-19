@@ -17,6 +17,6 @@ multiline_parsers:
 parsers:
   - name: php_slow_fields
     format: regex
-    regex: '^\[(?<timestamp>\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2})\]  \[pool www\] pid (?<pid>\d+)\nscript_filename = (?<script_filename>[^\s]+)\n\[0x[0-9a-f]+\] (?<top_stack_frame>[^(]+\(.*\) [^:]+)'
+    regex: '^\[(?<timestamp>\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2})\]  \[pool www\] pid (?<pid>\d+)\nscript_filename = (?<script_filename>[^\s]+)'
     time_key: timestamp
-    time_keep: on
+    time_format: '%d-%b-%Y %H:%M:%S'
